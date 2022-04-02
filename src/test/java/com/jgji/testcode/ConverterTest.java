@@ -47,6 +47,33 @@ class ConverterTest {
     }
 
     @Test
+    void convert_여러개() {
+        //given
+        String query = "INSERT INTO test_table (name, age, homepage, tag, nickname, address, detail_address, gender) values('jgji', 22, 'https://google.co.kr', '', null, null, null, 'man')";
+        String query1 = "INSERT INTO test_table (name, age, homepage, tag, nickname, address, detail_address, gender) values('jgji', 22, 'https://google.co.kr', '', '서울시', null, null, 'man')";
+        String query2 = "INSERT INTO test_table (name, age, homepage, tag, nickname, address, detail_address, gender) values('jgji', 22, 'https://google.co.kr', '', '여러분', null, null, 'man')";
+        String query3 = "INSERT INTO test_table (name, age, homepage, tag, nickname, address, detail_address, gender) values('jgji', 22, 'https://google.co.kr', '', '담배꽁초', null, null, 'man')";
+        String query4 = "INSERT INTO test_table (name, age, homepage, tag, nickname, address, detail_address, gender) values('jgji', 22, 'https://google.co.kr', '', null, null, null, 'man')";
+        String tableName = "test_table";
+
+        List<String> givens = new ArrayList<>();
+
+        givens.add(query);
+        givens.add(query1);
+        givens.add(query2);
+        givens.add(query3);
+        givens.add(query4);
+
+        //when
+        for (String given : givens) {
+            String when = converter.convert(tableName, given);
+            log.info(when);
+        }
+
+        //then
+    }
+
+    @Test
     void substringsBetween() {
         //given
         String query = "insert into bookmark(id, `test`,asd) values(1, 'qweqwe', 'ss');";
