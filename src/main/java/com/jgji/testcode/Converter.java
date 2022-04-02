@@ -19,6 +19,8 @@ public class Converter {
     private static final String UNDERSCORE = "_";
     private static final String ENTER = "\n";
 
+    private static final String DOT = ".";
+
 
     private static final int ASCII = 32;
 
@@ -30,12 +32,12 @@ public class Converter {
 
         List<String> values = values(columnAndValue[1]);
 
-        String camelcaseTableName = convertVariables(Arrays.asList(tableName)).get(0);
+        String camelcaseTableName = convertClassName(tableName);
         StringBuilder code = new StringBuilder();
 
-        code.append(camelcaseTableName).append("builder()").append(ENTER);
+        code.append(camelcaseTableName).append(DOT).append("builder()").append(ENTER);
         for (int i = 0; i < variables.size(); i++) {
-            code.append(variables.get(i)).append(OPEN).append(values.get(i)).append(END).append(ENTER);
+            code.append(DOT).append(variables.get(i)).append(OPEN).append(values.get(i)).append(END).append(ENTER);
         }
         code.append(".build();");
 
@@ -90,8 +92,28 @@ public class Converter {
         return sb.toString();
     }
 
+    public String convertClassName(String tableName) {
+        String className;
+        if (tableName.contains(UNDERSCORE)) {
+            String[] splits = tableName.split(UNDERSCORE);
+
+            String camelcase = convertCamelcase(splits);
+
+            className = splits[0] + camelcase;
+        } else {
+            className = tableName;
+        }
+
+        char[] chars = className.toCharArray();
+        char ch = (char) (chars[0] - ASCII);
+        chars[0] = ch;
+
+        return new String(chars);
+    }
+
     public List<String> values(String args) {
         final char separator = ',';
+        final char charApostrophe = '\'';
         char[] all = args.toCharArray();
 
         List<String> values = new ArrayList<>();
@@ -102,16 +124,32 @@ public class Converter {
         boolean end = false;
 
         for (char ch : all) {
-            if (ch == separator) {
-                values.add(value.toString());
+            if (ch == charApostrophe) {
+                if (!open) {
+                    open = true;
+                    value.append(ch);
+                } else {
+                    end = true;
+                    value.append(ch);
+                }
+            } else if (ch == separator && open && end) {
+                values.add(getString(value));
                 value = new StringBuilder();
                 open = false;
                 end = false;
+            } else if (ch == separator && !open && !end) {
+                values.add(getString(value));
+                value = new StringBuilder();
             } else {
                 value.append(ch);
             }
         }
+        values.add(getString(value));
 
         return values;
+    }
+
+    private String getString(StringBuilder sb) {
+        return sb.toString().trim();
     }
 }
