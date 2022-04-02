@@ -3,7 +3,6 @@ package com.jgji.testcode;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class Converter {
@@ -20,7 +19,6 @@ public class Converter {
     private static final String ENTER = "\n";
 
     private static final String DOT = ".";
-
 
     private static final int ASCII = 32;
 
@@ -150,6 +148,11 @@ public class Converter {
     }
 
     private String getString(StringBuilder sb) {
-        return sb.toString().trim();
+        String value = sb.toString();
+        if ("NULL".equals(value)) {
+            value = value.toLowerCase();
+        }
+
+        return value.trim().replace("'", "\"");
     }
 }
